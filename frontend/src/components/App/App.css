@@ -1,3 +1,4 @@
-.App {
-  margin: auto;
+.container {
+  margin: 15rem;
+  width: 35rem !important;
 }
