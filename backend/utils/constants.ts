@@ -1,4 +1,3 @@
-//should be in shared
 export const contractSavingsGBP = {
   'One Off': 40,
   Rolling: 30,
