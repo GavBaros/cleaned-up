@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Segment,
@@ -9,6 +9,8 @@ import {
   Select,
   Button
 } from 'semantic-ui-react';
+
+import Notification from '../Notification/Notification';
 
 import './App.css';
 
@@ -23,8 +25,23 @@ const App: React.FC = () => {
   const [subscriptionType, setSubscriptionType] = useState<SubscriptionValue>(
     'One Off'
   );
+  const [isDisabled, setDisabled] = useState<boolean>(true);
+
+  //RESPONSE STATES
+  const [isSubmitting, setSubmitting] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [grandTotal, setGrandTotal] = useState<number>(0);
+
+  //useEffect to enable button
+  useEffect(() => {
+    !postCode ? setDisabled(true) : setDisabled(false);
+  }, [postCode]);
 
   const fetchOrderPrice = async (): Promise<void> => {
+    setSubmitting(true);
+
     const data: DataType = {
       postCode,
       bottlesQuantity,
@@ -34,10 +51,30 @@ const App: React.FC = () => {
     try {
       const response = await postOrderData(data);
 
-      console.log(response);
+      if (response.data.status !== 200) {
+        setErrorState(response.data.message);
+      } else {
+        setSuccessState(response.data.grandTotal);
+      }
     } catch (error) {
-      console.log(error);
+      setErrorState(error);
     }
+  };
+
+  const setErrorState = (error: string) => {
+    setGrandTotal(0);
+    setSuccess(false);
+    setError(true);
+    setErrorMessage(error);
+    setSubmitting(false);
+  };
+
+  const setSuccessState = (grandTotal: number) => {
+    setGrandTotal(grandTotal);
+    setSuccess(true);
+    setError(false);
+    setErrorMessage('');
+    setSubmitting(false);
   };
 
   const handleInputChange = (
@@ -56,6 +93,7 @@ const App: React.FC = () => {
             <Label>Postcode</Label>
             <Input
               focus
+              disabled={isSubmitting}
               placeholder='Enter postcode'
               value={postCode}
               onChange={event =>
@@ -67,6 +105,7 @@ const App: React.FC = () => {
             <Label>Bottles per Month</Label>
             <Input
               min={1}
+              disabled={isSubmitting}
               type='number'
               placeholder='Enter amount of bottles'
               value={bottlesQuantity}
@@ -78,6 +117,7 @@ const App: React.FC = () => {
           <Form.Field>
             <Label>Subscription Package</Label>
             <Select
+              disabled={isSubmitting}
               placeholder='Select a subscription package'
               options={subscriptionOptions}
               value={subscriptionType}
@@ -86,9 +126,27 @@ const App: React.FC = () => {
               }
             />
           </Form.Field>
-          <Button type='submit' primary>
+          <Button
+            type='submit'
+            primary
+            loading={isSubmitting}
+            disabled={isDisabled}>
             Calculate price
           </Button>
+          {success && (
+            <Notification
+              isSuccess={true}
+              isError={false}
+              grandTotal={grandTotal}
+            />
+          )}
+          {error && (
+            <Notification
+              isSuccess={false}
+              isError={true}
+              errorMessage={errorMessage}
+            />
+          )}
         </Form>
       </Segment>
     </Container>
