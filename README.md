@@ -1,16 +1,18 @@
-## Getting started
+# Installing NPM modules
 
-In the project directory, install the NPM modules with:
+In both the `backend` and `frontend` project directories, ensure NPM modules are installed.
 
-### `npm install`
+From the root (`ChargedUpTest`) directory, change into `packages`, then in `backend`, then run `npm install`. Repeat with `frontend`.
 
-Then for a local development mode run:
+# Getting started locally
+
+Then for a local development mode, change into parent directory `CleanedUpTest` and run:
 
 ### `npm start`
 
 This allows Lerna to run both the `backend` and `frontend` folders locally in parallel.
 
-## Tests
+# Running tests
 
 Change your terminal into the `backend` folder and run:
 
